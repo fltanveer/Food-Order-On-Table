@@ -21,7 +21,8 @@ import {
   PlayCircle,
   Image as ImageIcon,
   Loader2,
-  Check
+  Check,
+  Mic
 } from 'lucide-react';
 import { TABLE_ID, CATEGORIES, MENU_ITEMS } from './constants';
 import { MenuItem, Category, CartItem, Screen, Choice } from './types';
@@ -189,6 +190,55 @@ const App: React.FC = () => {
   const removeItem = (cartId: string) => {
     setCart(prev => prev.filter(c => c.cartId !== cartId));
   };
+
+  // AI-driven actions memoized
+  const aiActions = useMemo(() => ({
+    openMenuItem: (itemName: string) => {
+      const item = menuItems.find(i => 
+        i.name.toLowerCase().includes(itemName.toLowerCase()) ||
+        itemName.toLowerCase().includes(i.name.toLowerCase())
+      );
+      if (item) {
+        setScreen('menu');
+        openDetails(item);
+        return `Opening details for ${item.name}. What options would you like?`;
+      }
+      return `I couldn't find "${itemName}" on our menu. We have delicious Lamb Shish and Falafel Wraps though!`;
+    },
+    navigateTo: (target: Screen) => {
+      setScreen(target);
+      return `Taking you to the ${target} page.`;
+    },
+    setCategory: (categoryId: string) => {
+      const cat = CATEGORIES.find(c => c.id === categoryId || c.name.toLowerCase().includes(categoryId.toLowerCase()));
+      if (cat) {
+        setScreen('menu');
+        setActiveCategory(cat.id);
+        setSearchQuery('');
+        return `Here are our ${cat.name} items.`;
+      }
+      return `I couldn't find that category. We have Plates, Wraps, Appetizers, and Desserts.`;
+    },
+    searchFor: (query: string) => {
+      setScreen('menu');
+      setSearchQuery(query);
+      return `Searching for "${query}"...`;
+    },
+    viewCart: () => {
+      setScreen('cart');
+      return "Showing your basket now. You can review your items here.";
+    },
+    placeOrder: () => {
+      if (cart.length === 0) return "Your basket is empty! What would you like to add first?";
+      setScreen('success');
+      return "Great choice! Your order is confirmed and the kitchen has started preparing it. Sit tight!";
+    },
+    getCartItems: () => {
+      if (cart.length === 0) return "Your basket is currently empty.";
+      const items = cart.map(c => `${c.quantity}x ${c.name}`).join(", ");
+      return `You currently have: ${items}. Total cost is $${cartTotal.toFixed(2)}. Shall I show you the basket for review?`;
+    }
+  }), [menuItems, openDetails, cart, cartTotal]);
 
   const isAddButtonDisabled = useMemo(() => {
     if (!selectedItem) return true;
@@ -720,7 +770,7 @@ const App: React.FC = () => {
       )}
 
       {/* AI Chat Drawer */}
-      {showAI && <AIChat onClose={() => setShowAI(false)} />}
+      {showAI && <AIChat onClose={() => setShowAI(false)} actions={aiActions} />}
     </div>
   );
 };
