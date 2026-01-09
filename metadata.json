@@ -1,0 +1,7 @@
+{
+  "name": "Boston Kebab AI Order",
+  "description": "A premium digital menu and ordering system for Boston Kebab, featuring an AI Concierge to help you choose the perfect Mediterranean meal.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
