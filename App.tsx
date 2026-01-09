@@ -19,7 +19,8 @@ import {
   Settings2,
   MapPin,
   PlayCircle,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Loader2
 } from 'lucide-react';
 import { TABLE_ID, CATEGORIES, MENU_ITEMS } from './constants';
 import { MenuItem, Category, CartItem, Screen, Choice } from './types';
@@ -34,6 +35,7 @@ const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isStaffMode, setIsStaffMode] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
+  const [videoLoading, setVideoLoading] = useState(false);
   
   // Selection State
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
@@ -71,13 +73,14 @@ const App: React.FC = () => {
 
   // Handlers
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    e.currentTarget.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=800';
+    e.currentTarget.src = 'https://placehold.co/800x600/1e293b/white?text=Boston+Kebab';
   };
 
   const openDetails = useCallback((item: MenuItem, editId: string | null = null) => {
     if (!item.isAvailable && !isStaffMode) return;
     
     setShowVideo(false);
+    setVideoLoading(false);
     if (editId) {
       const existing = cart.find(c => c.cartId === editId);
       if (existing) {
@@ -176,6 +179,11 @@ const App: React.FC = () => {
     );
   }, [selectedItem, tempOptions]);
 
+  const toggleVideo = () => {
+    if (!showVideo) setVideoLoading(true);
+    setShowVideo(!showVideo);
+  };
+
   // Views
   const Header = () => (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
@@ -183,7 +191,7 @@ const App: React.FC = () => {
         <div className="flex items-center gap-4">
           <button onClick={() => setScreen('welcome')} className="h-10 w-10 bg-slate-900 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-slate-200 hover:scale-105 transition-transform">B</button>
           <div>
-            <h1 className="font-extrabold text-slate-900 tracking-tight leading-none">Boston Kebab</h1>
+            <h1 className="font-extrabold text-slate-900 tracking-tight leading-none text-sm sm:text-base">Boston Kebab</h1>
             <div className="flex items-center gap-1.5 mt-1.5">
               {isStaffMode ? (
                 <div className="flex items-center gap-1 bg-orange-100 text-orange-600 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border border-orange-200">
@@ -199,11 +207,11 @@ const App: React.FC = () => {
         </div>
 
         {screen !== 'welcome' && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2">
             <Button 
               variant="ghost" 
               size="icon" 
-              className={isStaffMode ? 'text-orange-500 bg-orange-50' : 'text-slate-400'} 
+              className={`hidden sm:flex ${isStaffMode ? 'text-orange-500 bg-orange-50' : 'text-slate-400'}`} 
               onClick={() => setIsStaffMode(!isStaffMode)}
               title="Staff Management Mode"
             >
@@ -214,19 +222,19 @@ const App: React.FC = () => {
               <Sparkles className="h-5 w-5 text-emerald-600" />
             </Button>
             
-            <Button variant="outline" size="icon" onClick={() => alert("Waiter notified!")}>
+            <Button variant="outline" size="icon" className="hidden sm:flex" onClick={() => alert("Waiter notified!")}>
               <Bell className="h-5 w-5 text-slate-400" />
             </Button>
             <Button 
               variant={cartCount > 0 ? "primary" : "outline"} 
               size="default" 
-              className="relative pr-8"
+              className="relative px-3 sm:pr-8"
               onClick={() => setScreen('cart')}
             >
-              <ShoppingCart className="h-5 w-5 mr-2" />
+              <ShoppingCart className="h-5 w-5 sm:mr-2" />
               <span className="hidden sm:inline">Cart</span>
               {cartCount > 0 && (
-                <span className="absolute right-2 bg-emerald-500 text-white rounded-lg h-5 w-5 flex items-center justify-center text-[10px] font-black border-2 border-white">
+                <span className="absolute -top-1 -right-1 sm:top-auto sm:right-2 bg-emerald-500 text-white rounded-lg h-5 w-5 flex items-center justify-center text-[10px] font-black border-2 border-white">
                   {cartCount}
                 </span>
               )}
@@ -288,19 +296,13 @@ const App: React.FC = () => {
                     }`}
                   >
                     <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-[1.5rem] overflow-hidden border-2 border-white/20 shadow-md">
-                      <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
+                      <img src={cat.image} alt={cat.name} referrerPolicy="no-referrer" className="w-full h-full object-cover" />
                     </div>
                     <span className="font-extrabold text-xs sm:text-sm uppercase tracking-wider px-2 pb-1">{cat.name}</span>
                   </button>
                 ))}
               </div>
             </div>
-
-            {isStaffMode && (
-              <div className="bg-orange-50 border-b border-orange-100 px-4 py-2 text-[10px] font-bold text-orange-600 uppercase tracking-widest text-center">
-                Staff View: Tap Eye Icons to Toggle Item Availability
-              </div>
-            )}
 
             <div className="px-4 py-4 shrink-0">
                <div className="max-w-7xl mx-auto relative">
@@ -325,7 +327,7 @@ const App: React.FC = () => {
                     style={{ animationDelay: `${idx * 50}ms` }}
                   >
                     <div className={`relative h-56 overflow-hidden transition-all duration-500 ${!item.isAvailable ? 'grayscale opacity-60' : ''}`}>
-                      <img src={item.image} alt={item.name} onError={handleImageError} className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700" />
+                      <img src={item.image} alt={item.name} referrerPolicy="no-referrer" onError={handleImageError} className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700" />
                       
                       {!item.isAvailable && (
                         <div className="absolute inset-0 bg-slate-900/10 backdrop-blur-[2px] flex items-center justify-center">
@@ -408,7 +410,7 @@ const App: React.FC = () => {
                   <div className="flex-1 overflow-y-auto space-y-4 pr-2">
                     {cart.map((item) => (
                       <div key={item.cartId} className="bg-white rounded-3xl p-4 border border-slate-100 shadow-sm flex gap-4 animate-in slide-in-from-right-4">
-                        <img src={item.image} onError={handleImageError} className="w-24 h-24 rounded-2xl object-cover shrink-0" />
+                        <img src={item.image} referrerPolicy="no-referrer" onError={handleImageError} className="w-24 h-24 rounded-2xl object-cover shrink-0" />
                         <div className="flex-1 flex flex-col justify-between py-1">
                           <div>
                             <div className="flex justify-between items-start">
@@ -420,12 +422,6 @@ const App: React.FC = () => {
                                 <span key={idx} className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-md font-bold uppercase tracking-wider">{o.name}</span>
                               ))}
                             </div>
-                            {item.notes && (
-                              <div className="mt-2 flex items-start gap-2 bg-slate-50/50 p-2 rounded-lg border border-slate-100">
-                                <MessageSquareQuote className="h-3 w-3 text-slate-400 mt-1 shrink-0" />
-                                <span className="text-xs text-slate-500 italic line-clamp-2">{item.notes}</span>
-                              </div>
-                            )}
                           </div>
                           <div className="flex items-center justify-between mt-3">
                             <div className="flex items-center gap-3">
@@ -452,10 +448,6 @@ const App: React.FC = () => {
                           <div className="flex justify-between text-slate-400 font-bold uppercase tracking-widest text-xs">
                              <span>Subtotal</span>
                              <span>${cartTotal.toFixed(2)}</span>
-                          </div>
-                          <div className="flex justify-between text-slate-400 font-bold uppercase tracking-widest text-xs">
-                             <span>Tax (Included)</span>
-                             <span>$0.00</span>
                           </div>
                           <div className="flex justify-between items-end pt-2">
                              <span className="text-xl font-bold">Total Payable</span>
@@ -500,14 +492,19 @@ const App: React.FC = () => {
         <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-300">
           <div className="bg-white w-full max-w-2xl h-[95vh] sm:h-auto sm:max-h-[90vh] overflow-hidden flex flex-col rounded-t-[40px] sm:rounded-[40px] shadow-2xl animate-in slide-in-from-bottom-10 duration-500">
             {/* Modal Header */}
-            <div className={`relative shrink-0 transition-all duration-500 ${showVideo ? 'h-[40vh] sm:h-[400px]' : 'h-48 sm:h-64'}`}>
+            <div className={`relative shrink-0 transition-all duration-500 ease-out ${showVideo ? 'h-[45vh] sm:h-[400px]' : 'h-52 sm:h-72'}`}>
                {!showVideo ? (
                  <>
-                   <img src={selectedItem.image} onError={handleImageError} className={`w-full h-full object-cover ${!selectedItem.isAvailable ? 'grayscale opacity-60' : ''}`} />
+                   <img src={selectedItem.image} referrerPolicy="no-referrer" onError={handleImageError} className={`w-full h-full object-cover transition-opacity duration-500 ${!selectedItem.isAvailable ? 'grayscale opacity-60' : ''}`} />
                    <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
                  </>
                ) : (
-                 <div className="w-full h-full bg-black flex items-center justify-center">
+                 <div className="w-full h-full bg-slate-900 relative flex items-center justify-center overflow-hidden">
+                    {videoLoading && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-slate-900 z-10">
+                        <Loader2 className="h-10 w-10 text-emerald-500 animate-spin" />
+                      </div>
+                    )}
                     <video 
                       src={selectedItem.videoUrl} 
                       className="w-full h-full object-cover" 
@@ -515,6 +512,7 @@ const App: React.FC = () => {
                       loop 
                       muted 
                       playsInline
+                      onLoadedData={() => setVideoLoading(false)}
                     />
                  </div>
                )}
@@ -526,18 +524,21 @@ const App: React.FC = () => {
                {/* Video Toggle Button */}
                {selectedItem.videoUrl && (
                   <button 
-                    onClick={() => setShowVideo(!showVideo)}
-                    className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white shadow-xl px-5 py-2.5 rounded-full flex items-center gap-2 border border-slate-100 hover:scale-105 active:scale-95 transition-all z-20"
+                    onClick={toggleVideo}
+                    className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-white/95 backdrop-blur shadow-[0_10px_30px_rgba(0,0,0,0.15)] px-6 py-3 rounded-full flex items-center gap-3 border border-slate-100 hover:scale-105 active:scale-95 transition-all z-20 group"
                   >
                     {showVideo ? (
                       <>
-                        <ImageIcon className="h-4 w-4 text-slate-600" />
-                        <span className="text-xs font-black uppercase tracking-widest text-slate-900">Show Photo</span>
+                        <ImageIcon className="h-4 w-4 text-slate-500 group-hover:scale-110 transition-transform" />
+                        <span className="text-[11px] font-black uppercase tracking-widest text-slate-900">Show Photo</span>
                       </>
                     ) : (
                       <>
-                        <PlayCircle className="h-4 w-4 text-emerald-600" />
-                        <span className="text-xs font-black uppercase tracking-widest text-slate-900">Watch Cooking</span>
+                        <div className="relative">
+                          <PlayCircle className="h-5 w-5 text-emerald-600 group-hover:scale-110 transition-transform" />
+                          <div className="absolute inset-0 bg-emerald-500/20 rounded-full animate-ping" />
+                        </div>
+                        <span className="text-[11px] font-black uppercase tracking-widest text-slate-900">Watch Cooking</span>
                       </>
                     )}
                   </button>
@@ -556,18 +557,18 @@ const App: React.FC = () => {
                     <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-orange-200">Sold Out</span>
                   )}
                 </div>
-                <p className="text-slate-500 leading-relaxed">{selectedItem.description}</p>
+                <p className="text-slate-500 leading-relaxed text-sm sm:text-base">{selectedItem.description}</p>
               </div>
 
               {/* Options */}
               {selectedItem.options.map(group => (
                 <div key={group.id} className="mt-8">
-                  <div className="flex justify-between items-center mb-4">
-                    <h4 className="font-black text-slate-900 uppercase tracking-widest text-xs">{group.name}</h4>
+                  <div className="flex justify-between items-center mb-4 px-2">
+                    <h4 className="font-black text-slate-900 uppercase tracking-widest text-[10px]">{group.name}</h4>
                     {group.required ? (
-                      <span className="text-[10px] font-black bg-slate-900 text-white px-2 py-0.5 rounded-full uppercase tracking-widest">Required</span>
+                      <span className="text-[9px] font-black bg-slate-900 text-white px-2 py-0.5 rounded-full uppercase tracking-widest">Required</span>
                     ) : (
-                      <span className="text-[10px] font-black bg-slate-100 text-slate-400 px-2 py-0.5 rounded-full uppercase tracking-widest">Optional</span>
+                      <span className="text-[9px] font-black bg-slate-100 text-slate-400 px-2 py-0.5 rounded-full uppercase tracking-widest">Optional</span>
                     )}
                   </div>
                   <div className="space-y-3">
@@ -584,7 +585,7 @@ const App: React.FC = () => {
                             : 'bg-white border-slate-100 text-slate-600 hover:border-slate-300'
                           } ${(!selectedItem.isAvailable && !isStaffMode) ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                          <span className="font-bold">{choice.name}</span>
+                          <span className="font-bold text-sm sm:text-base">{choice.name}</span>
                           {choice.price > 0 && (
                             <span className={`text-sm font-bold ${isSelected ? 'text-emerald-400' : 'text-slate-400'}`}>+${choice.price.toFixed(2)}</span>
                           )}
@@ -597,7 +598,7 @@ const App: React.FC = () => {
 
               {/* Special Instructions */}
               <div className="mt-8 mb-4">
-                 <h4 className="font-black text-slate-900 uppercase tracking-widest text-xs mb-4">Special Instructions</h4>
+                 <h4 className="font-black text-slate-900 uppercase tracking-widest text-[10px] mb-4 px-2">Special Instructions</h4>
                  <div className="relative">
                     <MessageSquareQuote className="absolute left-4 top-4 h-5 w-5 text-slate-400" />
                     <textarea 
@@ -614,8 +615,8 @@ const App: React.FC = () => {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-6 bg-white border-t border-slate-100 flex items-center gap-4 sticky bottom-0 left-0 right-0 shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] z-20">
-              <div className="flex items-center bg-slate-100 rounded-2xl p-1 gap-6 px-4 shrink-0">
+            <div className="p-4 sm:p-6 bg-white border-t border-slate-100 flex items-center gap-3 sm:gap-4 sticky bottom-0 left-0 right-0 shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] z-20">
+              <div className="flex items-center bg-slate-100 rounded-2xl p-1 gap-4 sm:gap-6 px-3 sm:px-4 shrink-0">
                 <button 
                   disabled={!selectedItem.isAvailable && !isStaffMode}
                   onClick={() => setTempQuantity(Math.max(1, tempQuantity - 1))} 
@@ -623,7 +624,7 @@ const App: React.FC = () => {
                 >
                   <Minus className="h-5 w-5" />
                 </button>
-                <span className={`font-black text-xl w-6 text-center ${!selectedItem.isAvailable ? 'text-slate-400' : 'text-slate-900'}`}>{tempQuantity}</span>
+                <span className={`font-black text-lg sm:text-xl w-6 text-center ${!selectedItem.isAvailable ? 'text-slate-400' : 'text-slate-900'}`}>{tempQuantity}</span>
                 <button 
                   disabled={!selectedItem.isAvailable && !isStaffMode}
                   onClick={() => setTempQuantity(tempQuantity + 1)} 
@@ -635,7 +636,7 @@ const App: React.FC = () => {
               <Button 
                 variant={selectedItem.isAvailable ? "primary" : "ghost"} 
                 size="lg" 
-                className="flex-1 h-14 rounded-2xl text-lg font-black shadow-lg shadow-slate-200"
+                className="flex-1 h-12 sm:h-14 rounded-2xl text-base sm:text-lg font-black shadow-lg shadow-slate-200"
                 onClick={confirmAddToCart}
                 disabled={isAddButtonDisabled || (!selectedItem.isAvailable && !isStaffMode)}
               >
