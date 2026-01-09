@@ -77,7 +77,7 @@ const App: React.FC = () => {
   };
 
   const openDetails = useCallback((item: MenuItem, editId: string | null = null) => {
-    // Detail modal disabled in staff mode as requested
+    // Detail modal disabled in staff mode
     if (isStaffMode) return;
     if (!item.isAvailable) return;
     
@@ -345,7 +345,7 @@ const App: React.FC = () => {
                       {!item.isAvailable && (
                         <div className="absolute inset-0 bg-slate-900/10 backdrop-blur-[2px] flex items-center justify-center">
                            <div className="bg-white/90 px-6 py-2 rounded-2xl shadow-xl transform rotate-[-5deg] border-2 border-slate-900">
-                              <span className="text-xl font-black text-slate-900 uppercase tracking-tighter italic">Sold Out</span>
+                              <span className="text-xl font-black text-slate-900 uppercase tracking-tighter italic">Currently Unavailable</span>
                            </div>
                         </div>
                       )}
@@ -390,7 +390,7 @@ const App: React.FC = () => {
                           {item.isAvailable ? (
                             <>Add to Order <Plus className="ml-2 h-4 w-4" /></>
                           ) : (
-                            "Unavailable"
+                            "Check back soon"
                           )}
                         </Button>
                       ) : (
@@ -576,7 +576,7 @@ const App: React.FC = () => {
                     <span className="text-emerald-600 font-black text-xl">${selectedItem.price.toFixed(2)}</span>
                   </div>
                   {!selectedItem.isAvailable && (
-                    <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-orange-200">Sold Out</span>
+                    <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-orange-200">Currently Unavailable</span>
                   )}
                 </div>
                 <p className="text-slate-500 leading-relaxed text-sm sm:text-base">{selectedItem.description}</p>
@@ -663,7 +663,7 @@ const App: React.FC = () => {
                 disabled={isAddButtonDisabled || !selectedItem.isAvailable}
               >
                 {!selectedItem.isAvailable ? (
-                  "Sold Out"
+                  "Check back soon"
                 ) : (
                   `${editingCartId ? 'Update' : 'Add'} • $${(calculateUnitTotal(selectedItem, tempOptions) * tempQuantity).toFixed(2)}`
                 )}
