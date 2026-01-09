@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { 
   ShoppingCart, 
   Plus, 
@@ -20,7 +20,8 @@ import {
   MapPin,
   PlayCircle,
   Image as ImageIcon,
-  Loader2
+  Loader2,
+  Check
 } from 'lucide-react';
 import { TABLE_ID, CATEGORIES, MENU_ITEMS } from './constants';
 import { MenuItem, Category, CartItem, Screen, Choice } from './types';
@@ -36,6 +37,7 @@ const App: React.FC = () => {
   const [isStaffMode, setIsStaffMode] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [videoLoading, setVideoLoading] = useState(false);
+  const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: '', visible: false });
   
   // Selection State
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
@@ -75,6 +77,19 @@ const App: React.FC = () => {
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     e.currentTarget.src = 'https://placehold.co/800x600/1e293b/white?text=Boston+Kebab';
   };
+
+  const showToast = (message: string) => {
+    setToast({ message, visible: true });
+  };
+
+  useEffect(() => {
+    if (toast.visible) {
+      const timer = setTimeout(() => {
+        setToast(prev => ({ ...prev, visible: false }));
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast.visible]);
 
   const openDetails = useCallback((item: MenuItem, editId: string | null = null) => {
     // Detail modal disabled in staff mode
@@ -158,6 +173,7 @@ const App: React.FC = () => {
       }
     });
     
+    showToast(`${tempQuantity}x ${selectedItem.name} added to your order`);
     closeDetails();
   };
 
@@ -669,6 +685,26 @@ const App: React.FC = () => {
                 )}
               </Button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast.visible && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-[200] w-[92%] max-w-sm animate-in slide-in-from-bottom-6 duration-500 ease-out">
+          <div className="bg-emerald-600 text-white p-5 rounded-[2rem] shadow-[0_20px_50px_rgba(16,185,129,0.4)] flex items-center justify-between border-2 border-emerald-400/50 backdrop-blur-md">
+            <div className="flex items-center gap-4">
+              <div className="bg-white p-1.5 rounded-full shrink-0 shadow-sm">
+                <Check className="h-4 w-4 text-emerald-600 stroke-[3px]" />
+              </div>
+              <p className="text-sm font-extrabold uppercase tracking-wider leading-tight">{toast.message}</p>
+            </div>
+            <button 
+              onClick={() => setToast(prev => ({ ...prev, visible: false }))} 
+              className="p-2 hover:bg-black/10 rounded-full transition-colors ml-4"
+            >
+              <X className="h-5 w-5 text-white" />
+            </button>
           </div>
         </div>
       )}
