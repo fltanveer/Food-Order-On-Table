@@ -40,7 +40,7 @@ export const AIChat: React.FC<{ onClose: () => void }> = ({ onClose }) => {
             </div>
             <div>
               <h3 className="font-bold">AI Concierge</h3>
-              <p className="text-[10px] text-emerald-400 uppercase tracking-widest font-bold">Powered by Cognixlab</p>
+              <p className="text-[10px] text-emerald-400 uppercase tracking-widest font-bold">Powered by Gemini</p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">

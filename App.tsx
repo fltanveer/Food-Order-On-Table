@@ -17,7 +17,8 @@ import {
   MessageSquareQuote,
   Eye,
   EyeOff,
-  Settings2
+  Settings2,
+  MapPin
 } from 'lucide-react';
 import { TABLE_ID, CATEGORIES, MENU_ITEMS } from './constants';
 import { MenuItem, Category, CartItem, Screen, Choice } from './types';
@@ -179,18 +180,22 @@ const App: React.FC = () => {
           <button onClick={() => setScreen('welcome')} className="h-10 w-10 bg-slate-900 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-slate-200 hover:scale-105 transition-transform">B</button>
           <div>
             <h1 className="font-extrabold text-slate-900 tracking-tight leading-none">Boston Kebab</h1>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <span className={`w-2 h-2 rounded-full ${isStaffMode ? 'bg-orange-500' : 'bg-emerald-500'} animate-pulse`}></span>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                {isStaffMode ? 'Staff Mode' : `Table ${TABLE_ID.split(' ')[1]}`}
-              </span>
+            <div className="flex items-center gap-1.5 mt-1.5">
+              {isStaffMode ? (
+                <div className="flex items-center gap-1 bg-orange-100 text-orange-600 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border border-orange-200">
+                  <div className="w-1.5 h-1.5 bg-orange-500 rounded-full animate-pulse" /> Staff Mode
+                </div>
+              ) : (
+                <div className="flex items-center gap-1 bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest border border-emerald-100 shadow-sm">
+                  <MapPin className="w-2.5 h-2.5" /> {TABLE_ID}
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         {screen !== 'welcome' && (
           <div className="flex items-center gap-2">
-            {/* Staff Mode Toggle */}
             <Button 
               variant="ghost" 
               size="icon" 
@@ -235,6 +240,14 @@ const App: React.FC = () => {
       <main className="flex-1 overflow-hidden flex flex-col">
         {screen === 'welcome' && (
           <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+            {/* Prominent Table Banner */}
+            <div className="mb-6 bg-slate-900 text-white px-6 py-2.5 rounded-2xl shadow-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-700">
+               <div className="bg-emerald-500 p-1.5 rounded-lg">
+                  <MapPin className="w-4 h-4 text-white" />
+               </div>
+               <span className="font-black text-sm uppercase tracking-[0.2em]">Serving {TABLE_ID}</span>
+            </div>
+
             <div className="mb-8 relative">
               <div className="w-32 h-32 bg-white rounded-full shadow-2xl flex items-center justify-center animate-float">
                 <ChefHat className="h-16 w-16 text-slate-800" />
@@ -243,11 +256,14 @@ const App: React.FC = () => {
                 <Sparkles className="h-6 w-6" />
               </div>
             </div>
+            
             <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Experience Authentic<br/>Mediterranean Flavors</h2>
-            <p className="text-slate-500 max-w-xs mb-10 text-lg">Delicious kebabs, fresh wraps, and traditional mezes delivered to your table.</p>
+            <p className="text-slate-500 max-w-xs mb-10 text-lg">Delicious kebabs, fresh wraps, and traditional mezes delivered directly to <span className="text-slate-900 font-bold underline decoration-emerald-400 underline-offset-4">{TABLE_ID.toLowerCase()}</span>.</p>
+            
             <Button variant="primary" size="lg" className="w-full max-w-xs group" onClick={() => setScreen('menu')}>
-              Explore Menu <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              Start My Order <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Button>
+            
             <div className="mt-8 flex items-center gap-2 text-slate-400 font-bold uppercase tracking-widest text-[10px]">
               <Info className="h-3 w-3" /> Digital Ordering System
             </div>
@@ -256,7 +272,7 @@ const App: React.FC = () => {
 
         {screen === 'menu' && (
           <div className="flex-1 flex flex-col min-h-0">
-            {/* Categories - Significantly Larger */}
+            {/* Categories */}
             <div className="bg-white border-b border-slate-200 shadow-sm overflow-x-auto no-scrollbar py-6 px-4 shrink-0">
               <div className="max-w-7xl mx-auto flex gap-6 px-2">
                 {CATEGORIES.map(cat => (
@@ -465,8 +481,15 @@ const App: React.FC = () => {
             <div className="w-32 h-32 bg-emerald-100 rounded-full flex items-center justify-center mb-8 shadow-inner animate-bounce">
               <CheckCircle2 className="h-16 w-16 text-emerald-600" />
             </div>
-            <h2 className="text-4xl font-black text-slate-900 mb-4 tracking-tight">Order Received!</h2>
-            <p className="text-slate-500 mb-10 max-w-xs text-lg">Your items are being prepared. Sit back and relax, your meal will be at {TABLE_ID} shortly.</p>
+            <h2 className="text-4xl font-black text-slate-900 mb-2 tracking-tight">Order Received!</h2>
+            
+            <div className="bg-slate-100 px-4 py-1.5 rounded-xl border border-slate-200 mb-6 flex items-center gap-2">
+               <MapPin className="w-4 h-4 text-emerald-600" />
+               <span className="font-black text-xs uppercase tracking-widest text-slate-600">{TABLE_ID} Order Confirmed</span>
+            </div>
+
+            <p className="text-slate-500 mb-10 max-w-xs text-lg">Your items are being prepared. Sit back and relax, your meal will be brought to <span className="font-black text-slate-900">{TABLE_ID}</span> shortly.</p>
+            
             <div className="space-y-3 w-full max-w-xs">
                <Button variant="primary" size="lg" className="w-full" onClick={() => setScreen('menu')}>Order More Items</Button>
                <Button variant="outline" size="lg" className="w-full" onClick={() => { setCart([]); setScreen('welcome'); }}>Finished Meal</Button>
