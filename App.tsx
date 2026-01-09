@@ -77,7 +77,9 @@ const App: React.FC = () => {
   };
 
   const openDetails = useCallback((item: MenuItem, editId: string | null = null) => {
-    if (!item.isAvailable && !isStaffMode) return;
+    // Detail modal disabled in staff mode as requested
+    if (isStaffMode) return;
+    if (!item.isAvailable) return;
     
     setShowVideo(false);
     setVideoLoading(false);
@@ -211,34 +213,38 @@ const App: React.FC = () => {
             <Button 
               variant="ghost" 
               size="icon" 
-              className={`hidden sm:flex ${isStaffMode ? 'text-orange-500 bg-orange-50' : 'text-slate-400'}`} 
+              className={`${isStaffMode ? 'text-orange-500 bg-orange-50 ring-2 ring-orange-200' : 'text-slate-400'}`} 
               onClick={() => setIsStaffMode(!isStaffMode)}
               title="Staff Management Mode"
             >
               <Settings2 className="h-5 w-5" />
             </Button>
             
-            <Button variant="ghost" size="icon" onClick={() => setShowAI(true)}>
-              <Sparkles className="h-5 w-5 text-emerald-600" />
-            </Button>
-            
-            <Button variant="outline" size="icon" className="hidden sm:flex" onClick={() => alert("Waiter notified!")}>
-              <Bell className="h-5 w-5 text-slate-400" />
-            </Button>
-            <Button 
-              variant={cartCount > 0 ? "primary" : "outline"} 
-              size="default" 
-              className="relative px-3 sm:pr-8"
-              onClick={() => setScreen('cart')}
-            >
-              <ShoppingCart className="h-5 w-5 sm:mr-2" />
-              <span className="hidden sm:inline">Cart</span>
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 sm:top-auto sm:right-2 bg-emerald-500 text-white rounded-lg h-5 w-5 flex items-center justify-center text-[10px] font-black border-2 border-white">
-                  {cartCount}
-                </span>
-              )}
-            </Button>
+            {!isStaffMode && (
+              <>
+                <Button variant="ghost" size="icon" onClick={() => setShowAI(true)}>
+                  <Sparkles className="h-5 w-5 text-emerald-600" />
+                </Button>
+                
+                <Button variant="outline" size="icon" className="hidden sm:flex" onClick={() => alert("Waiter notified!")}>
+                  <Bell className="h-5 w-5 text-slate-400" />
+                </Button>
+                <Button 
+                  variant={cartCount > 0 ? "primary" : "outline"} 
+                  size="default" 
+                  className="relative px-3 sm:pr-8"
+                  onClick={() => setScreen('cart')}
+                >
+                  <ShoppingCart className="h-5 w-5 sm:mr-2" />
+                  <span className="hidden sm:inline">Cart</span>
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 sm:top-auto sm:right-2 bg-emerald-500 text-white rounded-lg h-5 w-5 flex items-center justify-center text-[10px] font-black border-2 border-white">
+                      {cartCount}
+                    </span>
+                  )}
+                </Button>
+              </>
+            )}
           </div>
         )}
       </div>
@@ -283,6 +289,13 @@ const App: React.FC = () => {
 
         {screen === 'menu' && (
           <div className="flex-1 flex flex-col min-h-0">
+            {isStaffMode && (
+              <div className="bg-orange-500 text-white px-4 py-3 flex items-center justify-center gap-3 animate-in slide-in-from-top duration-300">
+                <Settings2 className="w-5 h-5 animate-spin-slow" />
+                <span className="text-xs font-black uppercase tracking-widest text-center">Staff Mode — Tap Toggle button to update availability</span>
+              </div>
+            )}
+
             <div className="bg-white border-b border-slate-200 shadow-sm overflow-x-auto no-scrollbar py-6 px-4 shrink-0">
               <div className="max-w-7xl mx-auto flex gap-6 px-2">
                 {CATEGORIES.map(cat => (
@@ -291,7 +304,7 @@ const App: React.FC = () => {
                     onClick={() => { setActiveCategory(cat.id); setSearchQuery(''); }}
                     className={`flex flex-col items-center gap-3 p-2 min-w-[100px] sm:min-w-[140px] rounded-[2rem] transition-all duration-300 border-2 shrink-0 ${
                       activeCategory === cat.id 
-                      ? 'bg-slate-900 border-slate-900 text-white shadow-2xl scale-110 -translate-y-1' 
+                      ? (isStaffMode ? 'bg-orange-600 border-orange-600' : 'bg-slate-900 border-slate-900') + ' text-white shadow-2xl scale-110 -translate-y-1' 
                       : 'bg-white border-slate-50 text-slate-500 hover:border-slate-200 hover:bg-slate-50'
                     }`}
                   >
@@ -322,7 +335,7 @@ const App: React.FC = () => {
                 {filteredItems.map((item, idx) => (
                   <div 
                     key={item.id} 
-                    className={`bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all group flex flex-col relative ${(!item.isAvailable && !isStaffMode) ? 'cursor-default' : 'cursor-pointer'}`}
+                    className={`bg-white rounded-3xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl transition-all group flex flex-col relative ${(!item.isAvailable && !isStaffMode) ? 'cursor-default' : (isStaffMode ? 'cursor-default' : 'cursor-pointer')}`}
                     onClick={() => openDetails(item)}
                     style={{ animationDelay: `${idx * 50}ms` }}
                   >
@@ -343,40 +356,49 @@ const App: React.FC = () => {
                         </div>
                       )}
                       
-                      {item.isAvailable && (
+                      {!isStaffMode && item.isAvailable && (
                         <div className="absolute bottom-3 right-3 bg-slate-900 text-white px-3 py-1.5 rounded-xl font-bold shadow-lg">
                           ${item.price.toFixed(2)}
                         </div>
                       )}
                     </div>
 
-                    {isStaffMode && (
-                      <button 
-                        onClick={(e) => toggleAvailability(item.id, e)}
-                        className={`absolute top-3 right-3 p-2 rounded-xl shadow-xl z-20 transition-all ${item.isAvailable ? 'bg-white text-slate-900' : 'bg-orange-500 text-white'}`}
-                      >
-                        {item.isAvailable ? <Eye className="h-5 w-5" /> : <EyeOff className="h-5 w-5" />}
-                      </button>
-                    )}
-
                     <div className="p-6 flex flex-col flex-1">
-                      <h3 className={`text-xl font-bold mb-2 transition-colors ${!item.isAvailable ? 'text-slate-400' : 'text-slate-900 group-hover:text-emerald-600'}`}>
-                        {item.name}
-                      </h3>
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className={`text-xl font-bold transition-colors ${!item.isAvailable ? 'text-slate-400' : 'text-slate-900 group-hover:text-emerald-600'}`}>
+                          {item.name}
+                        </h3>
+                        {isStaffMode && (
+                          <button 
+                            onClick={(e) => toggleAvailability(item.id, e)}
+                            className={`flex items-center gap-2 px-3 py-1.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all ${item.isAvailable ? 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200 hover:bg-emerald-100' : 'bg-red-50 text-red-600 ring-1 ring-red-200 hover:bg-red-100'}`}
+                          >
+                            {item.isAvailable ? <><Eye className="h-3.5 w-3.5" /> Mark Unavailable</> : <><EyeOff className="h-3.5 w-3.5" /> Mark Available</>}
+                          </button>
+                        )}
+                      </div>
+                      
                       <p className={`text-sm leading-relaxed mb-6 flex-1 line-clamp-2 ${!item.isAvailable ? 'text-slate-300' : 'text-slate-500'}`}>
                         {item.description}
                       </p>
                       
-                      <Button 
-                        variant={item.isAvailable ? "outline" : "ghost"} 
-                        className={`w-full transition-all ${item.isAvailable ? 'group-hover:bg-slate-900 group-hover:text-white' : 'pointer-events-none opacity-40'}`}
-                      >
-                        {item.isAvailable ? (
-                          <>Add to Order <Plus className="ml-2 h-4 w-4" /></>
-                        ) : (
-                          "Unavailable"
-                        )}
-                      </Button>
+                      {!isStaffMode ? (
+                        <Button 
+                          variant={item.isAvailable ? "outline" : "ghost"} 
+                          className={`w-full transition-all ${item.isAvailable ? 'group-hover:bg-slate-900 group-hover:text-white' : 'pointer-events-none opacity-40'}`}
+                        >
+                          {item.isAvailable ? (
+                            <>Add to Order <Plus className="ml-2 h-4 w-4" /></>
+                          ) : (
+                            "Unavailable"
+                          )}
+                        </Button>
+                      ) : (
+                        <div className="w-full bg-slate-50 rounded-2xl py-3 flex items-center justify-center gap-2 border border-dashed border-slate-200">
+                          <Settings2 className="w-4 h-4 text-slate-400" />
+                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Management Only</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -577,13 +599,13 @@ const App: React.FC = () => {
                       return (
                         <button
                           key={choice.id}
-                          disabled={!selectedItem.isAvailable && !isStaffMode}
+                          disabled={!selectedItem.isAvailable}
                           onClick={() => handleOptionToggle(group.id, choice, group.type)}
                           className={`w-full flex items-center justify-between p-4 rounded-2xl border-2 transition-all text-left ${
                             isSelected 
                             ? 'bg-slate-900 border-slate-900 text-white shadow-lg' 
                             : 'bg-white border-slate-100 text-slate-600 hover:border-slate-300'
-                          } ${(!selectedItem.isAvailable && !isStaffMode) ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          } ${!selectedItem.isAvailable ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                           <span className="font-bold text-sm sm:text-base">{choice.name}</span>
                           {choice.price > 0 && (
@@ -604,9 +626,9 @@ const App: React.FC = () => {
                     <textarea 
                       placeholder="E.g. No onions, extra napkins, allergy notes..."
                       value={tempNotes}
-                      disabled={!selectedItem.isAvailable && !isStaffMode}
+                      disabled={!selectedItem.isAvailable}
                       onChange={(e) => setTempNotes(e.target.value)}
-                      className={`w-full bg-slate-50 border border-slate-200 rounded-2xl pl-12 pr-4 py-4 min-h-[120px] text-sm focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all resize-none font-medium ${(!selectedItem.isAvailable && !isStaffMode) ? 'opacity-50' : ''}`}
+                      className={`w-full bg-slate-50 border border-slate-200 rounded-2xl pl-12 pr-4 py-4 min-h-[120px] text-sm focus:outline-none focus:ring-4 focus:ring-slate-100 transition-all resize-none font-medium ${!selectedItem.isAvailable ? 'opacity-50' : ''}`}
                     />
                  </div>
               </div>
@@ -618,7 +640,7 @@ const App: React.FC = () => {
             <div className="p-4 sm:p-6 bg-white border-t border-slate-100 flex items-center gap-3 sm:gap-4 sticky bottom-0 left-0 right-0 shrink-0 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] z-20">
               <div className="flex items-center bg-slate-100 rounded-2xl p-1 gap-4 sm:gap-6 px-3 sm:px-4 shrink-0">
                 <button 
-                  disabled={!selectedItem.isAvailable && !isStaffMode}
+                  disabled={!selectedItem.isAvailable}
                   onClick={() => setTempQuantity(Math.max(1, tempQuantity - 1))} 
                   className="h-10 w-10 flex items-center justify-center rounded-xl hover:bg-white transition-all text-slate-600 active:scale-90 disabled:opacity-30"
                 >
@@ -626,7 +648,7 @@ const App: React.FC = () => {
                 </button>
                 <span className={`font-black text-lg sm:text-xl w-6 text-center ${!selectedItem.isAvailable ? 'text-slate-400' : 'text-slate-900'}`}>{tempQuantity}</span>
                 <button 
-                  disabled={!selectedItem.isAvailable && !isStaffMode}
+                  disabled={!selectedItem.isAvailable}
                   onClick={() => setTempQuantity(tempQuantity + 1)} 
                   className="h-10 w-10 flex items-center justify-center rounded-xl hover:bg-white transition-all text-slate-600 active:scale-90 disabled:opacity-30"
                 >
@@ -638,9 +660,9 @@ const App: React.FC = () => {
                 size="lg" 
                 className="flex-1 h-12 sm:h-14 rounded-2xl text-base sm:text-lg font-black shadow-lg shadow-slate-200"
                 onClick={confirmAddToCart}
-                disabled={isAddButtonDisabled || (!selectedItem.isAvailable && !isStaffMode)}
+                disabled={isAddButtonDisabled || !selectedItem.isAvailable}
               >
-                {!selectedItem.isAvailable && !isStaffMode ? (
+                {!selectedItem.isAvailable ? (
                   "Sold Out"
                 ) : (
                   `${editingCartId ? 'Update' : 'Add'} • $${(calculateUnitTotal(selectedItem, tempOptions) * tempQuantity).toFixed(2)}`
@@ -652,7 +674,7 @@ const App: React.FC = () => {
       )}
 
       {/* AI Assistant FAB */}
-      {screen !== 'welcome' && (
+      {screen !== 'welcome' && !isStaffMode && (
         <button 
           onClick={() => setShowAI(true)}
           className="fixed bottom-6 right-6 bg-slate-900 text-white p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all z-40 group border-4 border-white"
