@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, useCallback } from 'react';
 import { 
   ShoppingCart, 
@@ -373,7 +372,7 @@ const App: React.FC = () => {
                         className={`w-full transition-all ${item.isAvailable ? 'group-hover:bg-slate-900 group-hover:text-white' : 'pointer-events-none opacity-40'}`}
                       >
                         {item.isAvailable ? (
-                          <>Customize <Plus className="ml-2 h-4 w-4" /></>
+                          <>Add to Order <Plus className="ml-2 h-4 w-4" /></>
                         ) : (
                           "Unavailable"
                         )}

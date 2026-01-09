@@ -11,17 +11,17 @@ export const CATEGORIES: Category[] = [
   { 
     id: 'plates', 
     name: 'Kebab Plates',
-    image: 'https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&q=80&w=400'
+    image: 'https://images.unsplash.com/photo-1561651823-34feb02250e4?auto=format&fit=crop&q=80&w=400'
   },
   { 
     id: 'wraps', 
     name: 'Wraps',
-    image: 'https://images.unsplash.com/photo-1662116765994-1e304675661b?auto=format&fit=crop&q=80&w=400'
+    image: 'https://images.unsplash.com/photo-1623156346149-d5ba8b73934f?auto=format&fit=crop&q=80&w=400'
   },
   { 
     id: 'sides', 
     name: 'Appetizers',
-    image: 'https://images.unsplash.com/photo-1577906096429-f7bad7d7bf82?auto=format&fit=crop&q=80&w=400'
+    image: 'https://images.unsplash.com/photo-1541529086526-db283c563270?auto=format&fit=crop&q=80&w=400'
   },
   { 
     id: 'desserts', 
@@ -31,7 +31,7 @@ export const CATEGORIES: Category[] = [
   { 
     id: 'drinks', 
     name: 'Drinks',
-    image: 'https://images.unsplash.com/photo-1558160074-4d7d8bdf4256?auto=format&fit=crop&q=80&w=400'
+    image: 'https://images.unsplash.com/photo-1579998119246-8e503ae6717a?auto=format&fit=crop&q=80&w=400'
   },
 ];
 
@@ -42,7 +42,7 @@ export const MENU_ITEMS: MenuItem[] = [
     name: 'Lamb Shish Plate',
     description: 'Tender, hand-cut cubes of marinated lamb grilled on skewers. Served with rice pilaf, shepherd salad, and warm pita.',
     price: 18.99,
-    image: 'https://images.unsplash.com/photo-1529042410759-befb1204b468?auto=format&fit=crop&q=80&w=1200',
+    image: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?auto=format&fit=crop&q=80&w=1200',
     popular: true,
     isAvailable: true,
     options: [
@@ -98,7 +98,7 @@ export const MENU_ITEMS: MenuItem[] = [
     name: 'Mixed Grill Feast',
     description: 'The ultimate sampler: Lamb Shish, Chicken Shish, and Adana Kebab. Perfect for those who want a bit of everything.',
     price: 28.50,
-    image: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?auto=format&fit=crop&q=80&w=1200',
+    image: 'https://images.unsplash.com/photo-1544124499-58912cbddaad?auto=format&fit=crop&q=80&w=1200',
     popular: true,
     isAvailable: true,
     options: [
@@ -153,7 +153,7 @@ export const MENU_ITEMS: MenuItem[] = [
     name: 'Sigara Borek',
     description: 'Crispy phyllo dough rolls filled with a savory blend of feta cheese and parsley. A classic Turkish appetizer.',
     price: 7.50,
-    image: 'https://images.unsplash.com/photo-1541529086526-db283c563270?auto=format&fit=crop&q=80&w=1200',
+    image: 'https://images.unsplash.com/photo-1608039858788-5878fe9019eb?auto=format&fit=crop&q=80&w=1200',
     popular: true,
     isAvailable: true,
     options: []
@@ -183,9 +183,9 @@ export const MENU_ITEMS: MenuItem[] = [
     id: 10,
     categoryId: 'drinks',
     name: 'Turkish Coffee',
-    description: 'Finely ground coffee brewed in a traditional cake (cezve). Served with a side of Turkish Delight.',
+    description: 'Finely ground coffee brewed in a traditional cezve. Served with a side of Turkish Delight.',
     price: 3.50,
-    image: 'https://images.unsplash.com/photo-1579998119246-8e503ae6717a?auto=format&fit=crop&q=80&w=1200',
+    image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&q=80&w=1200',
     popular: true,
     isAvailable: true,
     options: [
