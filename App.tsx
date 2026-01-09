@@ -17,7 +17,9 @@ import {
   Eye,
   EyeOff,
   Settings2,
-  MapPin
+  MapPin,
+  PlayCircle,
+  Image as ImageIcon
 } from 'lucide-react';
 import { TABLE_ID, CATEGORIES, MENU_ITEMS } from './constants';
 import { MenuItem, Category, CartItem, Screen, Choice } from './types';
@@ -30,7 +32,8 @@ const App: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState<string>('popular');
   const [showAI, setShowAI] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isStaffMode, setIsStaffMode] = useState(false); // Toggle for staff to manage availability
+  const [isStaffMode, setIsStaffMode] = useState(false);
+  const [showVideo, setShowVideo] = useState(false);
   
   // Selection State
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
@@ -39,7 +42,7 @@ const App: React.FC = () => {
   const [tempNotes, setTempNotes] = useState('');
   const [editingCartId, setEditingCartId] = useState<string | null>(null);
 
-  // Dynamic Menu State (Allowing toggling availability in session)
+  // Dynamic Menu State
   const [menuItems, setMenuItems] = useState<MenuItem[]>(MENU_ITEMS);
 
   // Data State
@@ -72,8 +75,9 @@ const App: React.FC = () => {
   };
 
   const openDetails = useCallback((item: MenuItem, editId: string | null = null) => {
-    if (!item.isAvailable && !isStaffMode) return; // Prevent guests from opening sold out items
+    if (!item.isAvailable && !isStaffMode) return;
     
+    setShowVideo(false);
     if (editId) {
       const existing = cart.find(c => c.cartId === editId);
       if (existing) {
@@ -105,6 +109,7 @@ const App: React.FC = () => {
     setTempOptions({});
     setTempQuantity(1);
     setTempNotes('');
+    setShowVideo(false);
   }, []);
 
   const calculateUnitTotal = (item: MenuItem, opts: Record<string, Choice[]>) => {
@@ -239,7 +244,6 @@ const App: React.FC = () => {
       <main className="flex-1 overflow-hidden flex flex-col">
         {screen === 'welcome' && (
           <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
-            {/* Prominent Table Banner */}
             <div className="mb-6 bg-slate-900 text-white px-6 py-2.5 rounded-2xl shadow-xl flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-700">
                <div className="bg-emerald-500 p-1.5 rounded-lg">
                   <MapPin className="w-4 h-4 text-white" />
@@ -271,7 +275,6 @@ const App: React.FC = () => {
 
         {screen === 'menu' && (
           <div className="flex-1 flex flex-col min-h-0">
-            {/* Categories */}
             <div className="bg-white border-b border-slate-200 shadow-sm overflow-x-auto no-scrollbar py-6 px-4 shrink-0">
               <div className="max-w-7xl mx-auto flex gap-6 px-2">
                 {CATEGORIES.map(cat => (
@@ -293,14 +296,12 @@ const App: React.FC = () => {
               </div>
             </div>
 
-            {/* Staff Mode Info Banner */}
             {isStaffMode && (
               <div className="bg-orange-50 border-b border-orange-100 px-4 py-2 text-[10px] font-bold text-orange-600 uppercase tracking-widest text-center">
                 Staff View: Tap Eye Icons to Toggle Item Availability
               </div>
             )}
 
-            {/* Search */}
             <div className="px-4 py-4 shrink-0">
                <div className="max-w-7xl mx-auto relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
@@ -314,7 +315,6 @@ const App: React.FC = () => {
                </div>
             </div>
 
-            {/* Grid */}
             <div className="flex-1 overflow-y-auto px-4 pb-20">
               <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredItems.map((item, idx) => (
@@ -327,7 +327,6 @@ const App: React.FC = () => {
                     <div className={`relative h-56 overflow-hidden transition-all duration-500 ${!item.isAvailable ? 'grayscale opacity-60' : ''}`}>
                       <img src={item.image} alt={item.name} onError={handleImageError} className="w-full h-full object-cover transition-transform group-hover:scale-110 duration-700" />
                       
-                      {/* Sold Out Overlay */}
                       {!item.isAvailable && (
                         <div className="absolute inset-0 bg-slate-900/10 backdrop-blur-[2px] flex items-center justify-center">
                            <div className="bg-white/90 px-6 py-2 rounded-2xl shadow-xl transform rotate-[-5deg] border-2 border-slate-900">
@@ -349,7 +348,6 @@ const App: React.FC = () => {
                       )}
                     </div>
 
-                    {/* Staff Control Button */}
                     {isStaffMode && (
                       <button 
                         onClick={(e) => toggleAvailability(item.id, e)}
@@ -502,12 +500,48 @@ const App: React.FC = () => {
         <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4 animate-in fade-in duration-300">
           <div className="bg-white w-full max-w-2xl h-[95vh] sm:h-auto sm:max-h-[90vh] overflow-hidden flex flex-col rounded-t-[40px] sm:rounded-[40px] shadow-2xl animate-in slide-in-from-bottom-10 duration-500">
             {/* Modal Header */}
-            <div className="relative h-48 sm:h-64 shrink-0">
-               <img src={selectedItem.image} onError={handleImageError} className={`w-full h-full object-cover ${!selectedItem.isAvailable ? 'grayscale opacity-60' : ''}`} />
-               <button onClick={closeDetails} className="absolute top-4 right-4 bg-white/20 backdrop-blur-md p-2 rounded-full text-white hover:bg-white/40 transition-colors z-20">
+            <div className={`relative shrink-0 transition-all duration-500 ${showVideo ? 'h-[40vh] sm:h-[400px]' : 'h-48 sm:h-64'}`}>
+               {!showVideo ? (
+                 <>
+                   <img src={selectedItem.image} onError={handleImageError} className={`w-full h-full object-cover ${!selectedItem.isAvailable ? 'grayscale opacity-60' : ''}`} />
+                   <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
+                 </>
+               ) : (
+                 <div className="w-full h-full bg-black flex items-center justify-center">
+                    <video 
+                      src={selectedItem.videoUrl} 
+                      className="w-full h-full object-cover" 
+                      autoPlay 
+                      loop 
+                      muted 
+                      playsInline
+                    />
+                 </div>
+               )}
+               
+               <button onClick={closeDetails} className="absolute top-4 right-4 bg-black/20 backdrop-blur-md p-2 rounded-full text-white hover:bg-black/40 transition-colors z-20">
                   <X className="h-6 w-6" />
                </button>
-               <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent"></div>
+
+               {/* Video Toggle Button */}
+               {selectedItem.videoUrl && (
+                  <button 
+                    onClick={() => setShowVideo(!showVideo)}
+                    className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-white shadow-xl px-5 py-2.5 rounded-full flex items-center gap-2 border border-slate-100 hover:scale-105 active:scale-95 transition-all z-20"
+                  >
+                    {showVideo ? (
+                      <>
+                        <ImageIcon className="h-4 w-4 text-slate-600" />
+                        <span className="text-xs font-black uppercase tracking-widest text-slate-900">Show Photo</span>
+                      </>
+                    ) : (
+                      <>
+                        <PlayCircle className="h-4 w-4 text-emerald-600" />
+                        <span className="text-xs font-black uppercase tracking-widest text-slate-900">Watch Cooking</span>
+                      </>
+                    )}
+                  </button>
+               )}
             </div>
 
             {/* Modal Content */}

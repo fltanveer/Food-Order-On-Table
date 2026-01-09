@@ -1,4 +1,3 @@
-
 export interface Choice {
   id: string;
   name: string;
@@ -21,9 +20,10 @@ export interface MenuItem {
   description: string;
   price: number;
   image: string;
+  videoUrl?: string; // Optional video URL for cooking preview
   popular?: boolean;
   options: OptionGroup[];
-  isAvailable?: boolean; // New property to track item availability
+  isAvailable?: boolean;
 }
 
 export interface Category {

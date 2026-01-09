@@ -16,7 +16,7 @@ export const CATEGORIES: Category[] = [
   { 
     id: 'wraps', 
     name: 'Wraps',
-    image: 'https://images.unsplash.com/photo-1623156346149-d5ba8b73934f?auto=format&fit=crop&q=80&w=400'
+    image: 'https://images.unsplash.com/photo-1626700051175-6818013e1d4f?auto=format&fit=crop&q=80&w=400'
   },
   { 
     id: 'sides', 
@@ -31,7 +31,7 @@ export const CATEGORIES: Category[] = [
   { 
     id: 'drinks', 
     name: 'Drinks',
-    image: 'https://images.unsplash.com/photo-1579998119246-8e503ae6717a?auto=format&fit=crop&q=80&w=400'
+    image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&q=80&w=400'
   },
 ];
 
@@ -43,6 +43,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: 'Tender, hand-cut cubes of marinated lamb grilled on skewers. Served with rice pilaf, shepherd salad, and warm pita.',
     price: 18.99,
     image: 'https://images.unsplash.com/photo-1603360946369-dc9bb6258143?auto=format&fit=crop&q=80&w=1200',
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-cooking-meat-on-a-grill-4261-large.mp4',
     popular: true,
     isAvailable: true,
     options: [
@@ -77,7 +78,8 @@ export const MENU_ITEMS: MenuItem[] = [
     name: 'Chicken Adana',
     description: 'Minced chicken mixed with red bell peppers and spices, mounted on a wide skewer and grilled. A smoky, savory delight.',
     price: 16.50,
-    image: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&q=80&w=1200',
+    image: 'https://images.unsplash.com/photo-1598514982205-f36b96d1e8d4?auto=format&fit=crop&q=80&w=1200',
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-meat-cooking-on-a-grill-4262-large.mp4',
     isAvailable: true,
     options: [
       {
@@ -98,7 +100,8 @@ export const MENU_ITEMS: MenuItem[] = [
     name: 'Mixed Grill Feast',
     description: 'The ultimate sampler: Lamb Shish, Chicken Shish, and Adana Kebab. Perfect for those who want a bit of everything.',
     price: 28.50,
-    image: 'https://images.unsplash.com/photo-1544124499-58912cbddaad?auto=format&fit=crop&q=80&w=1200',
+    image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&q=80&w=1200',
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-barbecue-meat-on-a-grill-4260-large.mp4',
     popular: true,
     isAvailable: true,
     options: [
@@ -121,6 +124,7 @@ export const MENU_ITEMS: MenuItem[] = [
     description: 'Homemade crispy falafels with hummus, lettuce, tomatoes, and tahini sauce rolled in a soft lavash bread.',
     price: 11.99,
     image: 'https://images.unsplash.com/photo-1547058881-883302334807?auto=format&fit=crop&q=80&w=1200',
+    videoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-chef-preparing-a-fresh-salad-4251-large.mp4',
     popular: true,
     isAvailable: true,
     options: [
